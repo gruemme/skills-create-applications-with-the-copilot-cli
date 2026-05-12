@@ -1,0 +1,16 @@
+{
+  "name": "cli-calculator",
+  "version": "0.1.0",
+  "description": "Simple Node.js CLI calculator supporting + - * /",
+  "bin": {
+    "calc": "src/calculator.js"
+  },
+  "scripts": {
+    "test": "jest --colors"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}
