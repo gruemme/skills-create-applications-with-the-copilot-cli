@@ -9,50 +9,75 @@
 // Usage: calc <number1> <operator> <number2>
 // Example: calc 4 + 5
 
-const args = process.argv.slice(2);
-
-function usage() {
-  console.error('Usage: calc <number1> <operator> <number2>');
-  console.error('Supported operators: +  -  *  /  (also: add, subtract, mul, div, x)');
-  process.exit(1);
+function add(a, b) {
+  return a + b;
 }
 
-if (args.length !== 3) {
-  usage();
+function subtract(a, b) {
+  return a - b;
 }
 
-const a = Number(args[0]);
-const op = args[1];
-const b = Number(args[2]);
-
-if (Number.isNaN(a) || Number.isNaN(b)) {
-  console.error('Error: both operands must be numbers');
-  process.exit(2);
+function multiply(a, b) {
+  return a * b;
 }
 
-let result;
-switch (op) {
-  case '+':
-  case 'add':
-    result = a + b; break;
-  case '-':
-  case 'subtract':
-    result = a - b; break;
-  case '*':
-  case 'x':
-  case 'X':
-  case 'mul':
-    result = a * b; break;
-  case '/':
-  case 'div':
-    if (b === 0) {
+function divide(a, b) {
+  if (b === 0) throw new Error('DivisionByZero');
+  return a / b;
+}
+
+function calculate(a, op, b) {
+  a = Number(a);
+  b = Number(b);
+  if (Number.isNaN(a) || Number.isNaN(b)) throw new Error('OperandsMustBeNumbers');
+
+  switch (op) {
+    case '+':
+    case 'add':
+      return add(a, b);
+    case '-':
+    case 'subtract':
+      return subtract(a, b);
+    case '*':
+    case 'x':
+    case 'X':
+    case 'mul':
+      return multiply(a, b);
+    case '/':
+    case 'div':
+      return divide(a, b);
+    default:
+      throw new Error('UnsupportedOperator:' + op);
+  }
+}
+
+if (require.main === module) {
+  const args = process.argv.slice(2);
+  function usage() {
+    console.error('Usage: calc <number1> <operator> <number2>');
+    console.error('Supported operators: +  -  *  /  (also: add, subtract, mul, div, x)');
+    process.exit(1);
+  }
+
+  if (args.length !== 3) {
+    usage();
+  }
+
+  try {
+    const result = calculate(args[0], args[1], args[2]);
+    console.log(result);
+  } catch (err) {
+    if (err.message === 'DivisionByZero') {
       console.error('Error: division by zero');
       process.exit(3);
     }
-    result = a / b; break;
-  default:
-    console.error('Error: unsupported operator', op);
+    if (err.message === 'OperandsMustBeNumbers') {
+      console.error('Error: both operands must be numbers');
+      process.exit(2);
+    }
+    console.error('Error:', err.message);
     usage();
+  }
 }
 
-console.log(result);
+module.exports = { add, subtract, multiply, divide, calculate };
