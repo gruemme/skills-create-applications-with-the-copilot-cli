@@ -44,11 +44,23 @@ function squareRoot(n) {
 }
 
 function calculate(a, op, b) {
-  // Note: calculate expects numeric operands. For unary ops like 'sqrt', pass the number as `a` and `b` may be undefined.
-  const aNum = Number(a);
-  const bNum = b === undefined ? undefined : Number(b);
+  // Handle unary sqrt in either position: `calculate(16, 'sqrt')` or `calculate('sqrt', 16)` or `calculate('sqrt', undefined)`
+  if (String(op).toLowerCase() === 'sqrt') {
+    const val = b === undefined ? Number(a) : Number(b);
+    if (isNaN(val)) throw new Error('OperandsMustBeNumbers');
+    return squareRoot(val);
+  }
+  if (String(a).toLowerCase() === 'sqrt') {
+    // Support calculate('sqrt', 16) and calculate('sqrt', undefined, 16) possibilities
+    const val = b !== undefined ? Number(b) : Number(op);
+    if (isNaN(val)) throw new Error('OperandsMustBeNumbers');
+    return squareRoot(val);
+  }
 
-  if (isNaN(aNum) || (b !== undefined && isNaN(bNum))) throw new Error('OperandsMustBeNumbers');
+  // Binary operations
+  const aNum = Number(a);
+  const bNum = Number(b);
+  if (isNaN(aNum) || isNaN(bNum)) throw new Error('OperandsMustBeNumbers');
 
   switch (op) {
     case '+':
@@ -72,18 +84,6 @@ function calculate(a, op, b) {
     case 'pow':
     case '**':
       return power(aNum, bNum);
-    case 'sqrt':
-      // Support both `calculate(n, 'sqrt')` and `calculate('sqrt', n)` forms
-      if (b === undefined) {
-        return squareRoot(aNum);
-      }
-      // if a is 'sqrt' and b is number
-      if (String(a).toLowerCase() === 'sqrt') {
-        const val = Number(b);
-        if (isNaN(val)) throw new Error('OperandsMustBeNumbers');
-        return squareRoot(val);
-      }
-      return squareRoot(bNum);
     default:
       throw new Error('UnsupportedOperator:' + op);
   }

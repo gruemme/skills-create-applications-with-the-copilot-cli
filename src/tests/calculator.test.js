@@ -1,4 +1,4 @@
-const { add, subtract, multiply, divide, calculate } = require('../calculator');
+const { add, subtract, multiply, divide, modulo, power, squareRoot, calculate } = require('../calculator');
 
 describe('Calculator - basic operations', () => {
   test('examples from image', () => {
@@ -34,6 +34,36 @@ describe('Calculator - basic operations', () => {
   });
 
   test('unsupported operator throws', () => {
-    expect(() => calculate(1, '^', 2)).toThrow('UnsupportedOperator');
+    expect(() => calculate(1, 'unknown', 2)).toThrow('UnsupportedOperator');
+  });
+
+  // Extended operations tests
+  test('extended operations from image', () => {
+    // modulo
+    expect(calculate(5, '%', 2)).toBe(1);
+    expect(calculate(5, 'mod', 2)).toBe(1);
+
+    // power
+    expect(calculate(2, '^', 3)).toBe(8);
+    expect(calculate(2, 'pow', 3)).toBe(8);
+    expect(calculate(2, '**', 5)).toBe(32);
+
+    // square root (unary)
+    expect(calculate(16, 'sqrt')).toBe(4);
+    expect(calculate('sqrt', 16)).toBe(4);
+    expect(squareRoot(16)).toBe(4);
+  });
+
+  test('edge cases for new ops', () => {
+    // modulo by zero
+    expect(() => calculate(1, '%', 0)).toThrow('ModuloByZero');
+    expect(() => modulo(1, 0)).toThrow('ModuloByZero');
+
+    // negative square root
+    expect(() => calculate(-9, 'sqrt')).toThrow('NegativeSquareRoot');
+    expect(() => squareRoot(-9)).toThrow('NegativeSquareRoot');
+
+    // power with large exponent
+    expect(calculate(2, '^', 10)).toBe(1024);
   });
 });
